@@ -1,13 +1,9 @@
 # Bubble-Picker
 
+Forked from [Bubble Picker](https://github.com/igalata/Bubble-Picker)
+
 [![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)]()
-[![](https://jitpack.io/v/igalata/Bubble-Picker.svg)](https://jitpack.io/#igalata/Bubble-Picker)
 
-<a href='https://play.google.com/store/apps/details?id=com.igalata.bubblepickerdemo&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height="70" width="180"/></a>
-
-Check this [project on dribbble](https://dribbble.com/shots/3349372-Bubble-Picker-Open-Source-Component)
-
-Read how we did it [on Medium](https://medium.com/@igalata13/how-to-create-a-bubble-selection-animation-on-android-627044da4854#.ajonc010b)
 
 <img src="shot.gif"/>
 
@@ -29,7 +25,7 @@ allprojects {
 Add the dependency:
 ```Groovy
 dependencies {
-	compile 'com.github.igalata:Bubble-Picker:v0.2.4'
+	compile 'com.github.ScaCap:Bubble-Picker:0.2.5'
 }
 ```
 
