@@ -3,6 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.ScaCap'
 
+repositories {
+    jcenter()
+    mavenCentral()
+    google()
+}
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -33,6 +39,4 @@ dependencies {
     compile files('libs/jbox2d-library-2.1.2.2.jar')
     compile files('libs/slf4j-api-1.7.22.jar')
 }
-repositories {
-    mavenCentral()
-}
+
