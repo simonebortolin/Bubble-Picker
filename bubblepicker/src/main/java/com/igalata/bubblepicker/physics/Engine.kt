@@ -29,8 +29,8 @@ object Engine : ContactListener {
     private val bodies: ArrayList<CircleBody> = ArrayList()
     private var borders: ArrayList<Border> = ArrayList()
     private val resizeStep = 0.005f
-    var scaleX = 0f
-    var scaleY = 0f
+    private var scaleX = 0f
+    private var scaleY = 0f
     private var touch = false
     private val toBeResized = ArrayList<Item>()
 

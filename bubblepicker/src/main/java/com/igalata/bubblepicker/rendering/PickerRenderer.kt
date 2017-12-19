@@ -43,11 +43,11 @@ class PickerRenderer(val glView: View) : GLSurfaceView.Renderer {
     private var textureVertices: FloatArray? = null
     private var textureIds: IntArray? = null
 
-    val scaleX: Float
+    private val scaleX: Float
         get() = if (glView.width < glView.height) glView.height.toFloat() / glView.width.toFloat() else 1f
-    val scaleY: Float
+    private val scaleY: Float
         get() = if (glView.width < glView.height) 1f else glView.width.toFloat() / glView.height.toFloat()
-    val circles = ArrayList<Item>()
+    private val circles = ArrayList<Item>()
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         glClearColor(backgroundColor?.red ?: 1f, backgroundColor?.green ?: 1f,
