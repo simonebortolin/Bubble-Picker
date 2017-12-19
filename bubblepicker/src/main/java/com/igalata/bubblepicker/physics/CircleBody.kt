@@ -41,8 +41,8 @@ class CircleBody(val world: World, var position: Vec2, var radius: Float, var in
         get() = FixtureDef().apply {
             shape = this@CircleBody.shape
             density = this@CircleBody.density
-            restitution = 0.99f
-            friction = 0.01f
+            restitution = 1f
+            friction = 0f
         }
 
     private val bodyDef: BodyDef
