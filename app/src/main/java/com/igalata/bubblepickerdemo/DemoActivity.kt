@@ -50,7 +50,7 @@ class DemoActivity : AppCompatActivity() {
                 return PickerItem().apply {
                     if (position >= titles.size) {
                         title = "ReallyLongCountryName"
-                        titleLong = "ReallyLongCountry-\nName"
+                        titleBroken = "ReallyLongCountry-\nName"
                     } else {
                         title = titles[position]
                     }
