@@ -35,13 +35,6 @@ class PickerRenderer(val glView: View) : GLSurfaceView.Renderer {
         }
     var listener: BubblePickerListener? = null
     lateinit var items: ArrayList<PickerItem>
-    val selectedItems: List<PickerItem?>
-        get() = Engine.selectedBodies.map { circles.firstOrNull { circle -> circle.circleBody == it }?.pickerItem }
-    var centerImmediately = false
-        set(value) {
-            field = value
-            Engine.centerImmediately = value
-        }
 
     private var programId = 0
     private var verticesBuffer: FloatBuffer? = null
@@ -75,9 +68,8 @@ class PickerRenderer(val glView: View) : GLSurfaceView.Renderer {
 
     private fun initialize() {
         clear()
-        Engine.centerImmediately = centerImmediately
         Engine.build(items.size, scaleX, scaleY).forEachIndexed { index, body ->
-            circles.add(Item(items[index], body))
+            circles.add(Item(glView.context, items[index], body))
         }
         items.forEach { if (it.isSelected) Engine.resize(circles.first { circle -> circle.pickerItem == it }) }
         if (textureIds == null) textureIds = IntArray(circles.size * 2)
@@ -144,9 +136,6 @@ class PickerRenderer(val glView: View) : GLSurfaceView.Renderer {
         glShaderSource(this, shader)
         glCompileShader(this)
     }
-
-    fun swipe(x: Float, y: Float) = Engine.swipe(x.convertValue(glView.width, scaleX),
-            y.convertValue(glView.height, scaleY))
 
     fun release() = Engine.release()
 
