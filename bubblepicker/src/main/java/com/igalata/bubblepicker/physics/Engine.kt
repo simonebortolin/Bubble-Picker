@@ -1,15 +1,18 @@
 package com.igalata.bubblepicker.physics
 
 import com.igalata.bubblepicker.rendering.Item
-import com.igalata.bubblepicker.sqr
+import org.jbox2d.callbacks.ContactImpulse
+import org.jbox2d.callbacks.ContactListener
+import org.jbox2d.collision.Manifold
 import org.jbox2d.common.Vec2
 import org.jbox2d.dynamics.World
+import org.jbox2d.dynamics.contacts.Contact
 import java.util.*
 
 /**
  * Created by irinagalata on 1/26/17.
  */
-object Engine {
+object Engine : ContactListener {
 
     val selectedBodies: List<CircleBody>
         get() = bodies.filter { it.increased || it.toBeIncreased || it.isIncreasing }
@@ -18,67 +21,77 @@ object Engine {
         set(value) {
             field = value
             bubbleRadius = interpolate(0.1f, 0.25f, value / 100f)
-            gravity = interpolate(20f, 80f, value / 100f)
-            standardIncreasedGravity = interpolate(500f, 800f, value / 100f)
         }
-    var centerImmediately = false
-    private var standardIncreasedGravity = interpolate(500f, 800f, 0.5f)
-    private var bubbleRadius = 0.17f
+    private var bubbleRadius = 0.15f
 
     private val world = World(Vec2(0f, 0f), false)
-    private val step = 0.0005f
+    private val step = 1.0f / 60.0f
     private val bodies: ArrayList<CircleBody> = ArrayList()
     private var borders: ArrayList<Border> = ArrayList()
     private val resizeStep = 0.005f
-    private var scaleX = 0f
-    private var scaleY = 0f
+    var scaleX = 0f
+    var scaleY = 0f
     private var touch = false
-    private var gravity = 6f
-    private var increasedGravity = 55f
-    private var gravityCenter = Vec2(0f, 0f)
-    private val currentGravity: Float
-        get() = if (touch) increasedGravity else gravity
     private val toBeResized = ArrayList<Item>()
-    private val startX
-        get() = if (centerImmediately) 0.5f else 2.2f
-    private var stepsCount = 0
+
+    override fun endContact(p0: Contact?) {
+    }
+
+    override fun beginContact(p0: Contact) {
+        borders.forEach { border ->
+            if (border.itemBody == p0.fixtureA.body || border.itemBody == p0.fixtureB.body) {
+                val circle = if (border.itemBody == p0.fixtureA) p0.fixtureA else p0.fixtureB
+                var vel = circle.body.linearVelocity
+                vel = if (border.view == Border.HORIZONTAL) {
+                    Vec2(vel.x, -vel.y)
+                } else {
+                    Vec2(-vel.x, vel.y)
+                }
+                circle.body.linearVelocity = vel
+                return@forEach
+            }
+        }
+    }
+
+    override fun preSolve(p0: Contact?, p1: Manifold?) {
+    }
+
+    override fun postSolve(p0: Contact?, p1: ContactImpulse?) {
+    }
 
     fun build(bodiesCount: Int, scaleX: Float, scaleY: Float): List<CircleBody> {
         val density = interpolate(0.8f, 0.2f, radius / 100f)
         for (i in 0..bodiesCount - 1) {
-            val x = if (Random().nextBoolean()) -startX else startX
-            val y = if (Random().nextBoolean()) -0.5f / scaleY else 0.5f / scaleY
-            bodies.add(CircleBody(world, Vec2(x, y), bubbleRadius * scaleX, (bubbleRadius * scaleX) * 1.3f, density))
+            val x = Random().nextFloat() - 0.5f
+            val y = Random().nextFloat() - 0.5f
+            val vx = (if (Random().nextBoolean()) -0.01f else 0.01f) * Random().nextFloat() / scaleY
+            val vy = (if (Random().nextBoolean()) -0.01f else 0.01f) * Random().nextFloat() / scaleY
+            bodies.add(CircleBody(world, Vec2(x, y), bubbleRadius * scaleX, (bubbleRadius * scaleX) * 1.1f, density, Vec2(vx, vy)))
         }
         this.scaleX = scaleX
         this.scaleY = scaleY
         createBorders()
+
+        world.setContactListener(this)
+
+        bodies.forEach { body ->
+            body.physicalBody.apply {
+                applyLinearImpulse(body.initialForce, Vec2(0f, 0f))
+            }
+        }
 
         return bodies
     }
 
     fun move() {
         toBeResized.forEach { it.circleBody.resize(resizeStep) }
-        world.step(if (centerImmediately) 0.035f else step, 11, 11)
-        bodies.forEach { move(it) }
+        world.step(step, 8, 8)
         toBeResized.removeAll(toBeResized.filter { it.circleBody.finished })
-        stepsCount++
-        if (stepsCount >= 10) {
-            centerImmediately = false
-        }
-    }
-
-    fun swipe(x: Float, y: Float) {
-        if (Math.abs(gravityCenter.x) < 2) gravityCenter.x += -x
-        if (Math.abs(gravityCenter.y) < 0.5f / scaleY) gravityCenter.y += y
-        increasedGravity = standardIncreasedGravity * Math.abs(x * 13) * Math.abs(y * 13)
-        touch = true
     }
 
     fun release() {
-        gravityCenter.setZero()
+        world.setContactListener(null)
         touch = false
-        increasedGravity = standardIncreasedGravity
     }
 
     fun clear() {
@@ -97,26 +110,23 @@ object Engine {
 
         toBeResized.add(item)
 
+        val itemCenter = item.circleBody.physicalBody.worldCenter
+        bodies.filter { it.physicalBody != item.circleBody.physicalBody }.forEach {
+            var v = it.physicalBody.worldCenter.sub(itemCenter).mul(0.0025f)
+            v = if (item.circleBody.toBeDecreased) v.negate() else v
+            it.physicalBody.applyLinearImpulse(v, itemCenter)
+        }
+
         return true
     }
 
     private fun createBorders() {
         borders = arrayListOf(
                 Border(world, Vec2(0f, 0.5f / scaleY), Border.HORIZONTAL),
-                Border(world, Vec2(0f, -0.5f / scaleY), Border.HORIZONTAL)
+                Border(world, Vec2(0f, -0.5f / scaleY), Border.HORIZONTAL),
+                Border(world, Vec2(0.5f / scaleX, 0f), Border.VERTICAL),
+                Border(world, Vec2(-0.5f / scaleX, 0f), Border.VERTICAL)
         )
-    }
-
-    private fun move(body: CircleBody) {
-        body.physicalBody.apply {
-            body.isVisible = centerImmediately.not()
-            val direction = gravityCenter.sub(position)
-            val distance = direction.length()
-            val gravity = if (body.increased) 1.3f * currentGravity else currentGravity
-            if (distance > step * 200) {
-                applyForce(direction.mul(gravity / distance.sqr()), position)
-            }
-        }
     }
 
     private fun interpolate(start: Float, end: Float, f: Float) = start + f * (end - start)

@@ -7,7 +7,7 @@ import org.jbox2d.dynamics.*
 /**
  * Created by irinagalata on 1/26/17.
  */
-class CircleBody(val world: World, var position: Vec2, var radius: Float, var increasedRadius: Float, var density: Float) {
+class CircleBody(val world: World, var position: Vec2, var radius: Float, var increasedRadius: Float, var density: Float, val initialForce: Vec2 = Vec2(0f, 0f)) {
 
     val decreasedRadius: Float = radius
 
@@ -31,18 +31,18 @@ class CircleBody(val world: World, var position: Vec2, var radius: Float, var in
 
     var isVisible = true
 
-    private val margin = 0.01f
-    private val damping = 25f
     private val shape: CircleShape
         get() = CircleShape().apply {
-            m_radius = radius + margin
+            m_radius = radius
             m_p.setZero()
         }
 
     private val fixture: FixtureDef
         get() = FixtureDef().apply {
-            this.shape = this@CircleBody.shape
-            this.density = this@CircleBody.density
+            shape = this@CircleBody.shape
+            density = this@CircleBody.density
+            restitution = 0.99f
+            friction = 0.01f
         }
 
     private val bodyDef: BodyDef
@@ -63,7 +63,6 @@ class CircleBody(val world: World, var position: Vec2, var radius: Float, var in
     private fun initializeBody() {
         physicalBody = world.createBody(bodyDef).apply {
             createFixture(fixture)
-            linearDamping = damping
         }
     }
 
@@ -92,7 +91,7 @@ class CircleBody(val world: World, var position: Vec2, var radius: Float, var in
     }
 
     private fun reset() {
-        physicalBody.fixtureList?.shape?.m_radius = radius + margin
+        physicalBody.fixtureList?.shape?.m_radius = radius
     }
 
     fun defineState() {

@@ -1,13 +1,21 @@
 package com.igalata.bubblepicker.rendering
 
-import android.graphics.*
-import android.graphics.drawable.BitmapDrawable
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
 import android.opengl.GLES20.*
 import android.opengl.Matrix
-import android.text.Layout
-import android.text.StaticLayout
-import android.text.TextPaint
-import com.igalata.bubblepicker.model.BubbleGradient
+import android.support.v4.widget.TextViewCompat
+import android.support.v7.widget.AppCompatImageView
+import android.support.v7.widget.AppCompatTextView
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
 import com.igalata.bubblepicker.model.PickerItem
 import com.igalata.bubblepicker.physics.CircleBody
 import com.igalata.bubblepicker.rendering.BubbleShader.U_MATRIX
@@ -17,7 +25,7 @@ import org.jbox2d.common.Vec2
 /**
  * Created by irinagalata on 1/19/17.
  */
-data class Item(val pickerItem: PickerItem, val circleBody: CircleBody) {
+data class Item(val context: Context, val pickerItem: PickerItem, val circleBody: CircleBody) {
 
     val x: Float
         get() = circleBody.physicalBody.position.x
@@ -40,18 +48,45 @@ data class Item(val pickerItem: PickerItem, val circleBody: CircleBody) {
     private var imageTexture: Int = 0
     private val currentTexture: Int
         get() = if (circleBody.increased || circleBody.isIncreasing) imageTexture else texture
-    private val bitmapSize = 256f
-    private val gradient: LinearGradient?
-        get() {
-            return pickerItem.gradient?.let {
-                val horizontal = it.direction == BubbleGradient.HORIZONTAL
-                LinearGradient(if (horizontal) 0f else bitmapSize / 2f,
-                        if (horizontal) bitmapSize / 2f else 0f,
-                        if (horizontal) bitmapSize else bitmapSize / 2f,
-                        if (horizontal) bitmapSize / 2f else bitmapSize,
-                        it.startColor, it.endColor, Shader.TileMode.CLAMP)
-            }
-        }
+    private val bitmapSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 96f, context.resources.displayMetrics)
+    private val bitmapRect = Rect().apply {
+        set(0, 0, bitmapSize.toInt(), bitmapSize.toInt())
+    }
+    private val squareRect = Rect().apply {
+        val halfXY = Math.round((bitmapSize * Math.sqrt(2.0)) / 4.0)
+        val l = bitmapRect.centerX() - halfXY
+        val t = bitmapRect.centerY() - halfXY
+        val r = bitmapRect.centerX() + halfXY
+        val b = bitmapRect.centerY() + halfXY
+        set(l.toInt(), t.toInt(), r.toInt(), b.toInt())
+    }
+
+    private val viewIcon: AppCompatImageView = AppCompatImageView(context).apply {
+        setLayoutParams(LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT).apply {
+            weight = 1f
+        })
+        setImageDrawable(pickerItem.icon)
+        setScaleType(ImageView.ScaleType.CENTER)
+    }
+
+    private val viewText: AppCompatTextView = AppCompatTextView(context).apply {
+        setLayoutParams(LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT).apply {
+            weight = 1f
+        })
+        setText(pickerItem.title)
+        setGravity(Gravity.CENTER)
+
+        TextViewCompat.setAutoSizeTextTypeWithDefaults(this, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM)
+        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(this, 2, 16, 1, TypedValue.COMPLEX_UNIT_SP)
+    }
+
+    private val viewLayout: LinearLayout = LinearLayout(context).apply {
+        setLayoutParams(ViewGroup.LayoutParams(squareRect.width(), squareRect.height()))
+        setOrientation(LinearLayout.VERTICAL)
+
+        addView(viewIcon)
+        addView(viewText)
+    }
 
     fun drawItself(programId: Int, index: Int, scaleX: Float, scaleY: Float) {
         glActiveTexture(GL_TEXTURE)
@@ -67,19 +102,45 @@ data class Item(val pickerItem: PickerItem, val circleBody: CircleBody) {
         imageTexture = bindTexture(textureIds, index * 2 + 1, true)
     }
 
-    private fun createBitmap(isSelected: Boolean): Bitmap {
+    fun createBitmap(isSelected: Boolean): Bitmap {
         var bitmap = Bitmap.createBitmap(bitmapSize.toInt(), bitmapSize.toInt(), Bitmap.Config.ARGB_4444)
         val bitmapConfig: Bitmap.Config = bitmap.config ?: Bitmap.Config.ARGB_8888
         bitmap = bitmap.copy(bitmapConfig, true)
 
         val canvas = Canvas(bitmap)
 
-        if (isSelected) drawImage(canvas)
         drawBackground(canvas, isSelected)
-        drawIcon(canvas)
-        drawText(canvas, isSelected)
+
+        viewText.setMaxLines(1)
+        viewText.setTextColor(if (isSelected) pickerItem.selectedTextColor!! else pickerItem.textColor!!)
+        viewIcon.setVisibility(if (isSelected) View.VISIBLE else View.GONE)
+
+        measure()
+        layout()
+
+        // If we set the max lines as 2, then AutoResizeTextView will push for filling up both lines.
+        // So we ask for a max lines of 1 initially but if the threshold is crossed for minimum text size
+        // We set maxLines to two and then go through the measure, layout pass again.
+        val currTextSize = viewText.textSize / context.resources.displayMetrics.density
+        if (currTextSize <= 8) {
+            viewText.maxLines = 2
+            measure()
+            layout()
+        }
+
+        canvas.matrix = null
+        canvas.translate((squareRect.left - bitmapRect.left).toFloat(), (squareRect.top - bitmapRect.top).toFloat())
+        viewLayout.draw(canvas)
 
         return bitmap
+    }
+
+    private fun measure() {
+        viewLayout.measure(View.MeasureSpec.makeMeasureSpec(squareRect.width(), View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(squareRect.height(), View.MeasureSpec.EXACTLY))
+    }
+
+    private fun layout() {
+        viewLayout.layout(squareRect.left, squareRect.top, squareRect.right, squareRect.bottom)
     }
 
     private fun drawBackground(canvas: Canvas, isSelected: Boolean) {
@@ -91,82 +152,8 @@ data class Item(val pickerItem: PickerItem, val circleBody: CircleBody) {
             } else {
                 bgPaint.color = pickerItem.color!!
             }
-
         }
-        pickerItem.gradient?.let { bgPaint.shader = gradient }
-        if (isSelected) bgPaint.alpha = (pickerItem.overlayAlpha * 255).toInt()
         canvas.drawRect(0f, 0f, bitmapSize, bitmapSize, bgPaint)
-    }
-
-    private fun drawText(canvas: Canvas, isSelected: Boolean = false) {
-        if (pickerItem.title == null || pickerItem.textColor == null) return
-
-        val paint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-            if (isSelected) {
-                color = pickerItem.selectedTextColor!!
-            } else {
-                color = pickerItem.textColor!!
-            }
-
-            textSize = pickerItem.textSize
-            typeface = pickerItem.typeface
-        }
-
-        val maxTextHeight = if (pickerItem.icon == null) bitmapSize / 2f else bitmapSize / 2.7f
-
-        var textLayout = placeText(paint)
-
-        while (textLayout.height > maxTextHeight) {
-            paint.textSize--
-            textLayout = placeText(paint)
-        }
-
-        if (pickerItem.icon == null) {
-            canvas.translate((bitmapSize - textLayout.width) / 2f, (bitmapSize - textLayout.height) / 2f)
-        } else if (pickerItem.iconOnTop) {
-            canvas.translate((bitmapSize - textLayout.width) / 2f, bitmapSize / 2f)
-        } else {
-            canvas.translate((bitmapSize - textLayout.width) / 2f, bitmapSize / 2 - textLayout.height)
-        }
-
-        textLayout.draw(canvas)
-    }
-
-    private fun placeText(paint: TextPaint): StaticLayout {
-        return StaticLayout(pickerItem.title, paint, (bitmapSize * 0.9).toInt(),
-                Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false)
-    }
-
-    private fun drawIcon(canvas: Canvas) {
-        pickerItem.icon?.let {
-            val width = it.intrinsicWidth
-            val height = it.intrinsicHeight
-
-            val left = (bitmapSize / 2 - width / 2).toInt()
-            val right = (bitmapSize / 2 + width / 2).toInt()
-
-            if (pickerItem.title == null) {
-                it.bounds = Rect(left, (bitmapSize / 2 - height / 2).toInt(), right, (bitmapSize / 2 + height / 2).toInt())
-            } else if (pickerItem.iconOnTop) {
-                it.bounds = Rect(left, (bitmapSize / 2 - height).toInt(), right, (bitmapSize / 2).toInt())
-            } else {
-                it.bounds = Rect(left, (bitmapSize / 2).toInt(), right, (bitmapSize / 2 + height).toInt())
-            }
-
-            it.draw(canvas)
-        }
-    }
-
-    private fun drawImage(canvas: Canvas) {
-        pickerItem.backgroundImage?.let {
-            val height = (it as BitmapDrawable).bitmap.height.toFloat()
-            val width = it.bitmap.width.toFloat()
-            val ratio = Math.max(height, width) / Math.min(height, width)
-            val bitmapHeight = if (height < width) bitmapSize else bitmapSize * ratio
-            val bitmapWidth = if (height < width) bitmapSize * ratio else bitmapSize
-            it.bounds = Rect(0, 0, bitmapWidth.toInt(), bitmapHeight.toInt())
-            it.draw(canvas)
-        }
     }
 
     private fun bindTexture(textureIds: IntArray, index: Int, withImage: Boolean): Int {
