@@ -123,6 +123,9 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
         // We set maxLines to two and then go through the measure, layout pass again.
         val currTextSize = viewText.textSize / context.resources.displayMetrics.density
         if (currTextSize <= 8) {
+            pickerItem.titleBroken?.let {
+                viewText.text = it
+            }
             viewText.maxLines = 2
             measure()
             layout()

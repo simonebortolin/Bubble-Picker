@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.igalata.bubblepicker.BubblePickerListener
 import com.igalata.bubblepicker.adapter.BubblePickerAdapter
-import com.igalata.bubblepicker.model.BubbleGradient
 import com.igalata.bubblepicker.model.PickerItem
 import kotlinx.android.synthetic.main.activity_demo.*
 
@@ -45,16 +44,21 @@ class DemoActivity : AppCompatActivity() {
 
         picker.adapter = object : BubblePickerAdapter {
 
-            override val totalCount = titles.size
+            override val totalCount = titles.size + 1
 
             override fun getItem(position: Int): PickerItem {
                 return PickerItem().apply {
-                    title = titles[position]
-                    gradient = BubbleGradient(colors.getColor((position * 2) % 8, 0),
-                            colors.getColor((position * 2) % 8 + 1, 0), BubbleGradient.VERTICAL)
-                    typeface = mediumTypeface
+                    if (position >= titles.size) {
+                        title = "ReallyLongCountryName"
+                        titleBroken = "ReallyLongCountry-\nName"
+                    } else {
+                        title = titles[position]
+                    }
+
+                    color = ContextCompat.getColor(this@DemoActivity, android.R.color.black)
                     textColor = ContextCompat.getColor(this@DemoActivity, android.R.color.white)
-                    backgroundImage = ContextCompat.getDrawable(this@DemoActivity, images.getResourceId(position, 0))
+                    selectedColor = ContextCompat.getColor(this@DemoActivity, android.R.color.holo_blue_light)
+                    selectedTextColor = ContextCompat.getColor(this@DemoActivity, android.R.color.white)
                 }
             }
         }

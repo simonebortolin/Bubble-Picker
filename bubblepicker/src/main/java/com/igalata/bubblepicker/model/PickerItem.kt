@@ -7,6 +7,7 @@ import android.support.annotation.ColorInt
  * Created by irinagalata on 1/19/17.
  */
 data class PickerItem @JvmOverloads constructor(var title: String? = null,
+                                                var titleBroken: String? = null,
                                                 var icon: Drawable? = null,
                                                 @ColorInt var color: Int? = null,
                                                 @ColorInt var selectedColor: Int? = null,
