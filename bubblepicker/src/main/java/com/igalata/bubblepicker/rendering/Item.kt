@@ -75,9 +75,7 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
         })
         setText(pickerItem.title)
         setGravity(Gravity.CENTER)
-
-        TextViewCompat.setAutoSizeTextTypeWithDefaults(this, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM)
-        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(this, 2, 16, 1, TypedValue.COMPLEX_UNIT_SP)
+        autoTextSize(min = 2)
     }
 
     private val viewLayout: LinearLayout = LinearLayout(context).apply {
@@ -122,11 +120,12 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
         // So we ask for a max lines of 1 initially but if the threshold is crossed for minimum text size
         // We set maxLines to two and then go through the measure, layout pass again.
         val currTextSize = viewText.textSize / context.resources.displayMetrics.density
-        if (currTextSize <= 8) {
+        if (currTextSize <= pickerItem.minTextSize) {
             pickerItem.titleBroken?.let {
                 viewText.text = it
             }
             viewText.maxLines = 2
+            autoTextSize()
             measure()
             layout()
         }
@@ -144,6 +143,11 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
 
     private fun layout() {
         viewLayout.layout(squareRect.left, squareRect.top, squareRect.right, squareRect.bottom)
+    }
+
+    private fun autoTextSize(min: Int = pickerItem.minTextSize, max: Int = pickerItem.maxTextSize) {
+        TextViewCompat.setAutoSizeTextTypeWithDefaults(viewText, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM)
+        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(viewText, min, max, 1, pickerItem.textSizeUnit)
     }
 
     private fun drawBackground(canvas: Canvas, isSelected: Boolean) {
