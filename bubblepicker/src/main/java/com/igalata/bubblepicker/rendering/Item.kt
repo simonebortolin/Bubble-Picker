@@ -75,7 +75,7 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
         })
         setText(pickerItem.title)
         setGravity(Gravity.CENTER)
-        autoTextSize(min = 2)
+        autoTextSize(this, min = 2)
     }
 
     private val viewLayout: LinearLayout = LinearLayout(context).apply {
@@ -125,7 +125,7 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
                 viewText.text = it
             }
             viewText.maxLines = 2
-            autoTextSize()
+            autoTextSize(viewText, min = pickerItem.minTextSize)
             measure()
             layout()
         }
@@ -145,9 +145,9 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
         viewLayout.layout(squareRect.left, squareRect.top, squareRect.right, squareRect.bottom)
     }
 
-    private fun autoTextSize(min: Int = pickerItem.minTextSize, max: Int = pickerItem.maxTextSize) {
-        TextViewCompat.setAutoSizeTextTypeWithDefaults(viewText, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM)
-        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(viewText, min, max, 1, pickerItem.textSizeUnit)
+    private fun autoTextSize(view: AppCompatTextView, min: Int = pickerItem.minTextSize, max: Int = pickerItem.maxTextSize) {
+        TextViewCompat.setAutoSizeTextTypeWithDefaults(view, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM)
+        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(view, min, max, 1, pickerItem.textSizeUnit)
     }
 
     private fun drawBackground(canvas: Canvas, isSelected: Boolean) {
