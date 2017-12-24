@@ -25,7 +25,7 @@ allprojects {
 Add the dependency:
 ```Groovy
 dependencies {
-	compile 'com.github.ScaCap:Bubble-Picker:0.2.5'
+	compile 'com.github.simonebortolin:Bubble-Picker:0.2.11'
 }
 ```
 
@@ -94,41 +94,13 @@ picker.adapter = object : BubblePickerAdapter {
             override fun getItem(position: Int): PickerItem {
                 return PickerItem().apply {
                     title = titles[position]
-                    gradient = BubbleGradient(colors.getColor((position * 2) % 8, 0),
-                            colors.getColor((position * 2) % 8 + 1, 0), BubbleGradient.VERTICAL)
-                    typeface = mediumTypeface
+                    color = ContextCompat.getColor(this@DemoActivity, android.R.color.black)
                     textColor = ContextCompat.getColor(this@DemoActivity, android.R.color.white)
-                    backgroundImage = ContextCompat.getDrawable(this@DemoActivity, images.getResourceId(position, 0))
+                    selectedColor = ContextCompat.getColor(this@DemoActivity, android.R.color.holo_blue_light)
+                    selectedTextColor = ContextCompat.getColor(this@DemoActivity, android.R.color.white)
                 }
             }
 }
-```
-
-Java
-```java
-final String[] titles = getResources().getStringArray(R.array.countries);
-final TypedArray colors = getResources().obtainTypedArray(R.array.colors);
-final TypedArray images = getResources().obtainTypedArray(R.array.images);
-
-picker.setAdapter(new BubblePickerAdapter() {
-            @Override
-            public int getTotalCount() {
-                return titles.length;
-            }
-
-            @NotNull
-            @Override
-            public PickerItem getItem(int position) {
-                PickerItem item = new PickerItem();
-                item.setTitle(titles[position]);
-                item.setGradient(new BubbleGradient(colors.getColor((position * 2) % 8, 0),
-                        colors.getColor((position * 2) % 8 + 1, 0), BubbleGradient.VERTICAL));
-                item.setTypeface(mediumTypeface);
-                item.setTextColor(ContextCompat.getColor(DemoActivity.this, android.R.color.white));
-                item.setBackgroundImage(ContextCompat.getDrawable(DemoActivity.this, images.getResourceId(position, 0)));
-                return item;
-            }
-});
 ```
 
 Specify the `BubblePickerListener` to get notified about events
@@ -164,28 +136,6 @@ picker.setListener(new BubblePickerListener() {
 To get all selected items use `picker.selectedItems` variable in Kotlin or `picker.getSelectedItems()` method in Java.
 
 For more usage examples please review the sample app
-
-## Changelog
-
-### Version: 0.2.4
-
-* Added a possibility to setup the `BubblePicker` using `BubblePickerAdapter`
-
-### Version: 0.2.3
-
-* Fixed black textures issue on some devices
-
-### Version: 0.2.1
-
-* `BubblePicker.centerImmediately` veriable added, so it's possible to place the bubbles 
- in the center of the view immediately
-
-### Version: 0.2
-
-* `icon` parameter added to place an image on a bubble along with the title 
-* `iconOnTop` parameter added to control position of the icon on a bubble
-* `textSize` parameter added
-* `BubblePicker.bubbleSize` variable now can be changed from 1 to 100
 
 ## Known iOS versions of the animation
 
