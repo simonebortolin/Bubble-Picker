@@ -109,9 +109,13 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
 
         drawBackground(canvas, isSelected)
 
-        viewText.setMaxLines(1)
-        viewText.setTextColor(if (isSelected) pickerItem.selectedTextColor!! else pickerItem.textColor!!)
-        viewIcon.setVisibility(if (isSelected) View.VISIBLE else View.GONE)
+        viewText.maxLines = 1
+        viewText.setTextColor(if (isSelected) pickerItem.selectedTextColor?:pickerItem.textColor!! else pickerItem.textColor!!)
+        viewIcon.visibility = when {
+            isSelected && pickerItem.showIconInSelectedBubble -> View.VISIBLE
+            !isSelected && pickerItem.showIconInBubble -> View.VISIBLE
+            else -> View.GONE
+        }
 
         measure()
         layout()

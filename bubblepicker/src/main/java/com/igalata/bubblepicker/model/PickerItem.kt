@@ -10,6 +10,8 @@ import android.util.TypedValue
 data class PickerItem @JvmOverloads constructor(var title: String? = null,
                                                 var titleBroken: String? = null,
                                                 var icon: Drawable? = null,
+                                                var showIconInSelectedBubble: Boolean = false,
+                                                var showIconInBubble: Boolean = false,
                                                 @ColorInt var color: Int? = null,
                                                 @ColorInt var selectedColor: Int? = null,
                                                 @ColorInt var textColor: Int? = null,
