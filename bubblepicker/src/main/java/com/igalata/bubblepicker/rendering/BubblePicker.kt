@@ -25,7 +25,7 @@ class BubblePicker : GLSurfaceView {
         set(value) {
             field = value
             if (value != null) {
-                renderer.items = ArrayList((0..value.totalCount - 1)
+                renderer.items = ArrayList((0 until value.totalCount)
                         .map { value.getItem(it) }.toList())
             }
         }

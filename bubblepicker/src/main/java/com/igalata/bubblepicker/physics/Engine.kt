@@ -61,7 +61,7 @@ object Engine : ContactListener {
 
     fun build(bodiesCount: Int, scaleX: Float, scaleY: Float): List<CircleBody> {
         val density = interpolate(0.8f, 0.2f, radius / 100f)
-        for (i in 0..bodiesCount - 1) {
+        for (i in 0 until bodiesCount) {
             val x = Random().nextFloat() - 0.5f
             val y = Random().nextFloat() - 0.5f
             val vx = (if (Random().nextBoolean()) -0.01f else 0.01f) * Random().nextFloat() / scaleY

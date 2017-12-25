@@ -62,25 +62,25 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
     }
 
     private val viewIcon: AppCompatImageView = AppCompatImageView(context).apply {
-        setLayoutParams(LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT).apply {
+        layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT).apply {
             weight = 1f
-        })
+        }
         setImageDrawable(pickerItem.icon)
-        setScaleType(ImageView.ScaleType.CENTER)
+        scaleType = ImageView.ScaleType.CENTER
     }
 
     private val viewText: AppCompatTextView = AppCompatTextView(context).apply {
-        setLayoutParams(LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT).apply {
+        layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT).apply {
             weight = 1f
-        })
-        setText(pickerItem.title)
-        setGravity(Gravity.CENTER)
+        }
+        text = pickerItem.title
+        gravity = Gravity.CENTER
         autoTextSize(this, min = 2)
     }
 
     private val viewLayout: LinearLayout = LinearLayout(context).apply {
-        setLayoutParams(ViewGroup.LayoutParams(squareRect.width(), squareRect.height()))
-        setOrientation(LinearLayout.VERTICAL)
+        layoutParams = ViewGroup.LayoutParams(squareRect.width(), squareRect.height())
+        orientation = LinearLayout.VERTICAL
 
         addView(viewIcon)
         addView(viewText)
