@@ -12,7 +12,7 @@ import java.util.*
 /**
  * Created by irinagalata on 1/26/17.
  */
-object Engine : ContactListener {
+object EngineFinite : ContactListener {
 
     val selectedBodies: List<CircleBody>
         get() = bodies.filter { it.increased || it.toBeIncreased || it.isIncreasing }
@@ -112,10 +112,10 @@ object Engine : ContactListener {
 
         val itemCenter = item.circleBody.physicalBody.worldCenter
         bodies.filter { it.physicalBody != item.circleBody.physicalBody }.forEach {
-            var v = it.physicalBody.worldCenter.sub(itemCenter).mul(0.0025f)
-            v = if (item.circleBody.toBeDecreased) v.negate() else v
-            it.physicalBody.applyLinearImpulse(v, itemCenter)
-        }
+                    var v = it.physicalBody.worldCenter.sub(itemCenter).mul(0.0025f)
+                    v = if (item.circleBody.toBeDecreased) v.negate() else v
+                    it.physicalBody.applyLinearImpulse(v, itemCenter)
+                }
 
         return true
     }

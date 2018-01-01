@@ -3,5 +3,10 @@
     <declare-styleable name="BubblePicker">
         <attr name="maxSelectedCount" format="integer" />
         <attr name="backgroundColor" format="color" />
+        <attr name="mode" format="enum">
+            <enum name="spaceFinite" value="1" />
+            <enum name="spaceInfinite" value="2" />
+        </attr>
+
     </declare-styleable>
 </resources>

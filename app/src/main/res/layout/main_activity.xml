@@ -28,7 +28,8 @@
         android:scrollbarStyle="outsideOverlay"
         android:scrollbars="vertical"
         android:visibility="gone"
-        app:backgroundColor="@android:color/white" />
+        app:backgroundColor="@android:color/white"
+        app:mode="spaceInfinite" />
 
     <com.igalata.bubblepicker.rendering.BubblePicker
         android:id="@+id/pickerImage"

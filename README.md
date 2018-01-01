@@ -40,7 +40,7 @@ Add `BubblePicker` to your xml layout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.igalata.bubblepicker.rendering.BubblePicker
+    <com.igalata.bubblepicker.rendering.BubblePickerInfinite
         android:id="@+id/picker"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
