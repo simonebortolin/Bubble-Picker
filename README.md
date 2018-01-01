@@ -1,146 +1,46 @@
 # Bubble-Picker
+[![](https://jitpack.io/v/simonebortolin/Bubble-Picker.svg)](https://jitpack.io/#simonebortolin/Bubble-Picker)
+
+Android 3rd party library to make a bubble picker
 
 Forked from [Bubble Picker](https://github.com/igalata/Bubble-Picker)
 
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)]()
+## Screenshots
+<a href="https://github.com/simonebortolin/Bubble-Picker/blob/master/image_1.png"><img src="https://github.com/simonebortolin/Bubble-Picker/blob/master/image_1.png" alt="" width="200px"></a>
+<a href="https://github.com/simonebortolin/Bubble-Picker/blob/master/image_2.png"><img src="https://github.com/simonebortolin/Bubble-Picker/blob/master/image_2.png" alt="" width="200px"></a>
+<a href="https://github.com/simonebortolin/Bubble-Picker/blob/master/image_3.png"><img src="https://github.com/simonebortolin/Bubble-Picker/blob/master/image_3.png" alt="" width="200px"></a>
 
 
-<img src="shot.gif"/>
+## Installation
 
-## Requirements
-- Android SDK 16+
-
-## Usage
-
-Add to your root build.gradle:
-```Groovy
+Add this to your **root** build.gradle file (not your module build.gradle file) :
+```java
 allprojects {
-	repositories {
-	...
-	maven { url "https://jitpack.io" }
-	}
+  repositories {
+    ...
+    maven { url "https://jitpack.io" }
+  }
 }
 ```
 
-Add the dependency:
-```Groovy
+Add this to your module `build.gradle` file:
+```java
 dependencies {
-	compile 'com.github.simonebortolin:Bubble-Picker:0.2.11'
+  ...
+    compile 'com.github.simonebortolin:Bubble-Picker:0.3.0'
 }
 ```
-
-## How to use this library
-
-Add `BubblePicker` to your xml layout
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <com.igalata.bubblepicker.rendering.BubblePickerInfinite
-        android:id="@+id/picker"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:backgroundColor="@android:color/white" />
-
-</FrameLayout>
-```
-
-Override onResume() and onPause() methods to call the same methods from the `BubblePicker`
-
-Kotlin
-```kotlin
-override fun onResume() {
-      super.onResume()
-      picker.onResume()
-}
-
-override fun onPause() {
-      super.onPause()
-      picker.onPause()
-}
-```
-
-Java
-```java
-@Override
-protected void onResume() {
-      super.onResume();
-      picker.onResume();
-}
-
-@Override
-protected void onPause() {
-      super.onPause();
-      picker.onPause();
-}
-```
-
-Pass the `PickerItem` list to the `BubblePicker`
-
-Kotlin
-```kotlin
-val titles = resources.getStringArray(R.array.countries)
-val colors = resources.obtainTypedArray(R.array.colors)
-val images = resources.obtainTypedArray(R.array.images)
-
-picker.adapter = object : BubblePickerAdapter {
-
-            override val totalCount = titles.size
-
-            override fun getItem(position: Int): PickerItem {
-                return PickerItem().apply {
-                    title = titles[position]
-                    color = ContextCompat.getColor(this@DemoActivity, android.R.color.black)
-                    textColor = ContextCompat.getColor(this@DemoActivity, android.R.color.white)
-                    selectedColor = ContextCompat.getColor(this@DemoActivity, android.R.color.holo_blue_light)
-                    selectedTextColor = ContextCompat.getColor(this@DemoActivity, android.R.color.white)
-                }
-            }
-}
-```
-
-Specify the `BubblePickerListener` to get notified about events
-
-Kotlin
-```kotlin
-picker.listener = object : BubblePickerListener {
-            override fun onBubbleSelected(item: PickerItem) {
-
-            }
-
-            override fun onBubbleDeselected(item: PickerItem) {
-
-            }
-}
-```
-
-Java
-```java
-picker.setListener(new BubblePickerListener() {
-            @Override
-            public void onBubbleSelected(@NotNull PickerItem item) {
-                
-            }
-
-            @Override
-            public void onBubbleDeselected(@NotNull PickerItem item) {
-
-            }
-});
-```
-
-To get all selected items use `picker.selectedItems` variable in Kotlin or `picker.getSelectedItems()` method in Java.
-
-For more usage examples please review the sample app
 
 ## Known iOS versions of the animation
 
 * https://github.com/Ronnel/BubblePicker
 * https://github.com/efremidze/Magnetic
+
+## Credits
+
+
+I thank all the authors of the various commits that I have included in my fork
+
 
 ## License
 
