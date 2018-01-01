@@ -57,13 +57,16 @@ class BubblePicker @JvmOverloads constructor(context: Context?, attrs: Attribute
     val selectedItems: List<PickerItem?>
         get() = renderer.selectedItems
 
-    var centerImmediately = false
+    var centerImmediately = true
         set(value) {
             if (mode == SPACE_INFINITE) {
                 field = value
                 renderer.centerImmediately = value
             } else throw UnSupportedActionPickerException()
         }
+
+    var enableSwipe = true
+
     private var renderer: PickerRenderer
     private var startX = 0f
     private var startY = 0f
@@ -108,17 +111,21 @@ class BubblePicker @JvmOverloads constructor(context: Context?, attrs: Attribute
                 previousY = event.y
             }
             MotionEvent.ACTION_UP -> {
-                if (mode == SPACE_INFINITE) {
-                    if (isClick(event)) renderer.resize(event.x, event.y)
-                    renderer.release()
-                } else if (mode == SPACE_FINITE) {
-                    if (isClick(event) && !isTooFast()) renderer.resize(event.x, event.y)
-                    previousUpTime = System.currentTimeMillis()
-                    renderer.release()
+                when (mode) {
+                    SPACE_INFINITE -> {
+                        if (isClick(event)) renderer.resize(event.x, event.y)
+                        renderer.release()
+                    }
+                    SPACE_FINITE -> {
+                        if (isClick(event) && !isTooFast()) renderer.resize(event.x, event.y)
+                        previousUpTime = System.currentTimeMillis()
+                        renderer.release()
+                    }
+                    else -> release()
                 }
             }
             MotionEvent.ACTION_MOVE -> {
-                if ((isSwipe(event)) && (mode == SPACE_INFINITE)) {
+                if (mode == SPACE_INFINITE && isSwipe(event) && enableSwipe) {
                     renderer.swipe(previousX - event.x, previousY - event.y)
                     previousX = event.x
                     previousY = event.y
@@ -149,6 +156,14 @@ class BubblePicker @JvmOverloads constructor(context: Context?, attrs: Attribute
 
         if (array.hasValue(R.styleable.BubblePicker_backgroundColor)) {
             background = array.getColor(R.styleable.BubblePicker_backgroundColor, -1)
+        }
+
+        if (array.hasValue(R.styleable.BubblePicker_centerImmediately)) {
+            centerImmediately = array.getInt(R.styleable.BubblePicker_centerImmediately, -1) == 1
+        }
+
+        if (array.hasValue(R.styleable.BubblePicker_swipe)) {
+            enableSwipe = array.getInt(R.styleable.BubblePicker_swipe, -1) == 1
         }
         array.recycle()
     }

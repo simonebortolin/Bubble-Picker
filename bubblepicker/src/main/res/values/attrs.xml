@@ -7,6 +7,14 @@
             <enum name="spaceFinite" value="1" />
             <enum name="spaceInfinite" value="2" />
         </attr>
+        <attr name="swipe" format="enum">
+            <enum name="enable" value="1" />
+            <enum name="disable" value="0" />
+        </attr>
+        <attr name="centerImmediately" format="enum">
+            <enum name="enable" value="1" />
+            <enum name="disable" value="0" />
+        </attr>
 
     </declare-styleable>
 </resources>
