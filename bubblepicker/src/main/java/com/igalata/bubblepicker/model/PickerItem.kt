@@ -31,7 +31,7 @@ data class PickerItem @JvmOverloads constructor(var title: String? = null,
                               isSelected: Boolean = false,
                               minTextSize: Int = 8,
                               maxTextSize: Int = 12,
-                              textSizeUnit: Int = TypedValue.COMPLEX_UNIT_SP) : this(title, titleBroken, BubbleStyle(color, textColor, borderColor, if (showIconInBubble) icon else null), BubbleStyle(selectedColor, selectedTextColor, borderSelectedColor, if (showIconInSelectedBubble) icon else null), isSelected, minTextSize, maxTextSize, textSizeUnit)
+                              textSizeUnit: Int = TypedValue.COMPLEX_UNIT_SP) : this(title, titleBroken, BubbleStyle(color, textColor, borderColor, icon = if (showIconInBubble) icon else null), BubbleStyle(selectedColor, selectedTextColor, borderSelectedColor, icon = if (showIconInSelectedBubble) icon else null), isSelected, minTextSize, maxTextSize, textSizeUnit)
 
     var color: Int?
         @ColorInt
@@ -88,14 +88,15 @@ data class PickerItem @JvmOverloads constructor(var title: String? = null,
 data class BubbleStyle(@ColorInt var backgroundColor: Int? = null,
                        @ColorInt var textColor: Int? = null,
                        @ColorInt var borderColor: Int? = null,
+                       var borderSize: Float? = 1f,
                        var icon: Drawable? = null,
-                       var iconPosition: IconPosition? = null,
+                       var iconPosition: IconPosition? = IconPosition.TOP,
                        var image: Drawable? = null,
                        var gradient: BubbleGradient? = null,
                        var overlayAlpha: Float = 1f)
 
 
-enum class IconPosition { Top, Bottom }
+enum class IconPosition { TOP, BOTTOM }
 
 
 data class BubbleGradient @JvmOverloads constructor(val startColor: Int,

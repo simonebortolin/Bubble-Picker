@@ -1,6 +1,5 @@
 package com.igalata.bubblepickerdemo
 
-import android.graphics.Typeface
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.content.ContextCompat
@@ -11,20 +10,12 @@ import com.igalata.bubblepicker.BubblePickerListener
 import com.igalata.bubblepicker.adapter.BubblePickerAdapter
 import com.igalata.bubblepicker.model.BubbleGradient
 import com.igalata.bubblepicker.model.BubbleStyle
+import com.igalata.bubblepicker.model.IconPosition
 import com.igalata.bubblepicker.model.PickerItem
 import kotlinx.android.synthetic.main.main_activity.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val boldTypeface by lazy { Typeface.createFromAsset(assets, ROBOTO_BOLD) }
-    private val mediumTypeface by lazy { Typeface.createFromAsset(assets, ROBOTO_MEDIUM) }
-    private val regularTypeface by lazy { Typeface.createFromAsset(assets, ROBOTO_REGULAR) }
-
-    companion object {
-        private const val ROBOTO_BOLD = "roboto_bold.ttf"
-        private const val ROBOTO_MEDIUM = "roboto_medium.ttf"
-        private const val ROBOTO_REGULAR = "roboto_regular.ttf"
-    }
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -59,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
 
         simple()
-        gradeient()
+        gradient()
         image()
 
         pickerSimple.bubbleSize = 10
@@ -102,21 +93,26 @@ class MainActivity : AppCompatActivity() {
 
         pickerSimple.adapter = object : BubblePickerAdapter {
 
-            override val totalCount = titles.size + 1
+            override val totalCount = titles.size
 
             override fun getItem(position: Int): PickerItem {
                 return PickerItem().apply {
-                    if (position >= titles.size) {
-                        title = "ReallyLongCountryName"
-                        titleBroken = "ReallyLongCountry-\nName"
-                    } else {
-                        title = titles[position]
-                    }
+                    title = titles[position]
 
-                    color = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length(), 0))
+
+                    color = ContextCompat.getColor(this@MainActivity, android.R.color.white)
+                    borderColor = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length(), 0))
                     textColor = ContextCompat.getColor(this@MainActivity, android.R.color.black)
                     selectedColor = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length() + 1, 0))
                     selectedTextColor = ContextCompat.getColor(this@MainActivity, android.R.color.white)
+
+
+                    // inverse
+                    /*selectedColor = ContextCompat.getColor(this@MainActivity, android.R.color.white)
+                    selectedBorderColor = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length(), 0))
+                    selectedTextColor = ContextCompat.getColor(this@MainActivity, android.R.color.black)
+                    color = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length() + 1, 0))
+                    textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white)*/
                 }
             }
         }
@@ -124,50 +120,18 @@ class MainActivity : AppCompatActivity() {
         colors.recycle()
     }
 
-    private fun image() {
-        val titles = resources.getStringArray(R.array.countries)
-        val colors = resources.obtainTypedArray(R.array.colors)
-
-        pickerImage.adapter = object : BubblePickerAdapter {
-
-            override val totalCount = titles.size + 1
-
-            override fun getItem(position: Int): PickerItem {
-                return PickerItem().apply {
-                    if (position >= titles.size) {
-                        title = "ReallyLongCountryName"
-                        titleBroken = "ReallyLongCountry-\nName"
-                    } else {
-                        title = titles[position]
-                    }
-
-                    color = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length(), 0))
-                    textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white)
-                    selectedColor = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length() + 1, 0))
-                    selectedTextColor = ContextCompat.getColor(this@MainActivity, android.R.color.white)
-                }
-            }
-        }
-
-        colors.recycle()
-    }
-
-    private fun gradeient() {
+    private fun gradient() {
         val titles = resources.getStringArray(R.array.countries)
         val colors = resources.obtainTypedArray(R.array.colors_gradient)
 
         pickerGradient.adapter = object : BubblePickerAdapter {
 
-            override val totalCount = titles.size + 1
+            override val totalCount = titles.size
 
             override fun getItem(position: Int): PickerItem {
                 return PickerItem().apply {
-                    if (position >= titles.size) {
-                        title = "ReallyLongCountryName"
-                        titleBroken = "ReallyLongCountry-\nName"
-                    } else {
-                        title = titles[position]
-                    }
+                    title = titles[position]
+
 
                     bubbleStyle = BubbleStyle(
                             textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white),
@@ -185,6 +149,39 @@ class MainActivity : AppCompatActivity() {
         }
 
         colors.recycle()
+    }
+
+    private fun image() {
+        val titles = resources.getStringArray(R.array.countries)
+        val colors = resources.obtainTypedArray(R.array.colors)
+        val images = resources.obtainTypedArray(R.array.images)
+
+        pickerImage.adapter = object : BubblePickerAdapter {
+
+            override val totalCount = titles.size
+
+            override fun getItem(position: Int): PickerItem {
+                return PickerItem().apply {
+                    title = titles[position]
+
+
+                    bubbleStyle = BubbleStyle(
+                            textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white),
+                            backgroundColor = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length(), 0)),
+                            icon = ContextCompat.getDrawable(this@MainActivity, R.drawable.ic_flag_white_24dp),
+                            iconPosition = if (position % 2 == 0) IconPosition.TOP else IconPosition.BOTTOM
+                    )
+
+                    bubbleSelectedStyle = BubbleStyle(
+                            textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white),
+                            image = ContextCompat.getDrawable(this@MainActivity, images.getResourceId(position, 0))
+                    )
+                }
+            }
+        }
+
+        colors.recycle()
+        images.recycle()
     }
 
 }

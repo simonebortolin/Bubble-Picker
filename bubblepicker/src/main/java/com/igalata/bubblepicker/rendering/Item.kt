@@ -2,6 +2,7 @@ package com.igalata.bubblepicker.rendering
 
 import android.content.Context
 import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
 import android.opengl.GLES20.*
 import android.opengl.Matrix
 import android.support.v4.widget.TextViewCompat
@@ -13,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import com.igalata.bubblepicker.model.IconPosition
 import com.igalata.bubblepicker.model.PickerItem
 import com.igalata.bubblepicker.physics.CircleBody
 import com.igalata.bubblepicker.rendering.BubbleShader.U_MATRIX
@@ -60,7 +62,7 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
         set(l.toInt(), t.toInt(), r.toInt(), b.toInt())
     }
 
-    private val viewIcon: AppCompatImageView = AppCompatImageView(context).apply {
+    private val viewIconTop: AppCompatImageView = AppCompatImageView(context).apply {
         layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT).apply {
             weight = 1f
         }
@@ -76,12 +78,21 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
         autoTextSize(this, min = 2)
     }
 
+    private val viewIconBottom: AppCompatImageView = AppCompatImageView(context).apply {
+        layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT).apply {
+            weight = 1f
+        }
+        scaleType = ImageView.ScaleType.CENTER
+    }
+
     private val viewLayout: LinearLayout = LinearLayout(context).apply {
         layoutParams = ViewGroup.LayoutParams(squareRect.width(), squareRect.height())
         orientation = LinearLayout.VERTICAL
 
-        addView(viewIcon)
+        addView(viewIconTop)
         addView(viewText)
+        addView(viewIconBottom)
+
     }
 
     fun drawItself(programId: Int, index: Int, scaleX: Float, scaleY: Float) {
@@ -107,14 +118,31 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
 
         drawBackground(canvas, isSelected)
 
+        drawImage(canvas, isSelected)
+
+
+
         viewText.maxLines = 1
         val bubbleStyle = if (isSelected) pickerItem.bubbleSelectedStyle else pickerItem.bubbleStyle
         viewText.setTextColor(bubbleStyle.textColor ?: pickerItem.bubbleStyle.textColor
         ?: Color.WHITE)
-        if (bubbleStyle.icon != null) {
-            viewIcon.setImageDrawable(bubbleStyle.icon)
-            viewIcon.visibility = View.VISIBLE
-        } else viewIcon.visibility = View.GONE
+
+        when {
+            bubbleStyle.icon != null && bubbleStyle.iconPosition == IconPosition.TOP -> {
+                viewIconTop.setImageDrawable(bubbleStyle.icon)
+                viewIconTop.visibility = View.VISIBLE
+                viewIconBottom.visibility = View.GONE
+            }
+            bubbleStyle.icon != null && bubbleStyle.iconPosition == IconPosition.BOTTOM -> {
+                viewIconBottom.setImageDrawable(bubbleStyle.icon)
+                viewIconBottom.visibility = View.VISIBLE
+                viewIconTop.visibility = View.GONE
+            }
+            else -> {
+                viewIconTop.visibility = View.GONE
+                viewIconBottom.visibility = View.GONE
+            }
+        }
 
 
 
@@ -173,11 +201,25 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
 
         if (bubbleStyle.borderColor != null) {
             bgPaint.style = Paint.Style.STROKE
+            bgPaint.strokeWidth = (bubbleStyle.borderSize ?: 1f) * 6f
             bgPaint.color = bubbleStyle.borderColor!!
         }
 
-        canvas.drawRect(0f, 0f, bitmapSize, bitmapSize, bgPaint)
+        canvas.drawCircle(bitmapSize / 2, bitmapSize / 2, bitmapSize / 2 - (bgPaint.strokeWidth * 2), bgPaint)
 
+    }
+
+    private fun drawImage(canvas: Canvas, isSelected: Boolean) {
+        val backgroundImage = if (isSelected) pickerItem.bubbleSelectedStyle.image else pickerItem.bubbleStyle.image
+        backgroundImage?.let {
+            val height = (it as BitmapDrawable).bitmap.height.toFloat()
+            val width = it.bitmap.width.toFloat()
+            val ratio = Math.max(height, width) / Math.min(height, width)
+            val bitmapHeight = if (height < width) bitmapSize else bitmapSize * ratio
+            val bitmapWidth = if (height < width) bitmapSize * ratio else bitmapSize
+            it.bounds = Rect(0, 0, bitmapWidth.toInt(), bitmapHeight.toInt())
+            it.draw(canvas)
+        }
     }
 
     private fun bindTexture(textureIds: IntArray, index: Int, withImage: Boolean): Int {
