@@ -13,160 +13,160 @@ Forked from [Bubble Picker](https://github.com/igalata/Bubble-Picker)
 
 ## Installation
 
-Add this to your **root** build.gradle file (not your module build.gradle file) :
-```java
-allprojects {
-  repositories {
-    ...
-    maven { url "https://jitpack.io" }
-  }
-}
-```
+Step 1: Add this to your **root** build.gradle file (not your module build.gradle file):
 
-Add this to your module `build.gradle` file:
-```java
-dependencies {
-  ...
-    compile 'com.github.simonebortolin:Bubble-Picker:0.3.0'
-}
-```
+    allprojects {
+      repositories {
+        ...
+        maven { url "https://jitpack.io" }
+      }
+    }
+
+
+Step 2: Add this to your module `build.gradle` file:
+
+    dependencies {
+      ...
+        compile 'com.github.simonebortolin:Bubble-Picker:0.3.0'
+    }
+
 
 ## How to use this library
 
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <com.igalata.bubblepicker.rendering.BubblePicker
-        android:id="@+id/picker"
+    <?xml version="1.0" encoding="utf-8"?>
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:backgroundColor="@android:color/white" />
+        android:layout_height="match_parent">
+    
+        <com.igalata.bubblepicker.rendering.BubblePicker
+            android:id="@+id/picker"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:backgroundColor="@android:color/white" />
 
-</FrameLayout>
+    </FrameLayout>
 
 Override onResume() and onPause() methods to call the same methods from the BubblePicker
 
-Kotlin
-override fun onResume() {
-      super.onResume()
-      picker.onResume()
-}
-
-override fun onPause() {
-      super.onPause()
-      picker.onPause()
-}
-Java
-
-@Override
-protected void onResume() {
-      super.onResume();
-      picker.onResume();
-}
-
-@Override
-protected void onPause() {
-      super.onPause();
-      picker.onPause();
-}
+    Kotlin
+    override fun onResume() {
+          super.onResume()
+          picker.onResume()
+    }
+    
+    override fun onPause() {
+          super.onPause()
+          picker.onPause()
+    }
+    Java
+    
+    @Override
+    protected void onResume() {
+          super.onResume();
+          picker.onResume();
+    }
+    
+    @Override
+    protected void onPause() {
+          super.onPause();
+          picker.onPause();
+    }
 
 
 Specify the BubblePickerAdapter
 
 Kotlin
 
-val titles = resources.getStringArray(R.array.countries)
-val colors = resources.obtainTypedArray(R.array.colors)
-
-pickerSimple.adapter = object : BubblePickerAdapter {
-
-    override val totalCount = titles.size
+    val titles = resources.getStringArray(R.array.countries)
+    val colors = resources.obtainTypedArray(R.array.colors)
     
-    override fun getItem(position: Int): PickerItem {
-        return PickerItem().apply {
-            title = titles[position]
-    
-    
-            // edged
-            color = ContextCompat.getColor(this@MainActivity, android.R.color.white)
-            borderColor = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length(), 0))
-            textColor = ContextCompat.getColor(this@MainActivity, android.R.color.black)
-            selectedColor = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length() + 1, 0))
-            selectedTextColor = ContextCompat.getColor(this@MainActivity, android.R.color.white)
-    
-    
-            // or inverse
-            selectedColor = ContextCompat.getColor(this@MainActivity, android.R.color.white)
-            selectedBorderColor = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length(), 0))
-            selectedTextColor = ContextCompat.getColor(this@MainActivity, android.R.color.black)
-            color = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length() + 1, 0))
-            textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white)
-            
-            // or with shades
-            
-            bubbleStyle = BubbleStyle(
-                    textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white),
-                    gradient = BubbleGradient(colors.getColor((position * 2) % 8, 0),
-                            colors.getColor((position * 2) % 8 + 1, 0), if (position % 2 == 0) BubbleGradient.VERTICAL else BubbleGradient.HORIZONTAL)
-            )
+    pickerSimple.adapter = object : BubblePickerAdapter {
 
-            bubbleSelectedStyle = BubbleStyle(
-                    textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white),
-                    gradient = BubbleGradient(colors.getColor((position * 2) % 8, 0),
-                            colors.getColor((position * 2) % 8 + 1, 0), if (position % 2 == 1) BubbleGradient.VERTICAL else BubbleGradient.HORIZONTAL)
-            )
-            
-            // or with images
-            
-            bubbleStyle = BubbleStyle(
-                    textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white),
-                    backgroundColor = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length(), 0)),
-                    icon = ContextCompat.getDrawable(this@MainActivity, R.drawable.ic_flag_white_24dp),
-                    iconPosition = if (position % 2 == 0) IconPosition.TOP else IconPosition.BOTTOM
-            )
-
-            // or whit icon
-
-            bubbleSelectedStyle = BubbleStyle(
-                    textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white),
-                    image = ContextCompat.getDrawable(this@MainActivity, images.getResourceId(position, 0))
-            )
-
+        override val totalCount = titles.size
+        
+        override fun getItem(position: Int): PickerItem {
+            return PickerItem().apply {
+                title = titles[position]
+        
+        
+                // edged
+                color = ContextCompat.getColor(this@MainActivity, android.R.color.white)
+                borderColor = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length(), 0))
+                textColor = ContextCompat.getColor(this@MainActivity, android.R.color.black)
+                selectedColor = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length() + 1, 0))
+                selectedTextColor = ContextCompat.getColor(this@MainActivity, android.R.color.white)
+        
+        
+                // or inverse
+                selectedColor = ContextCompat.getColor(this@MainActivity, android.R.color.white)
+                selectedBorderColor = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length(), 0))
+                selectedTextColor = ContextCompat.getColor(this@MainActivity, android.R.color.black)
+                color = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length() + 1, 0))
+                textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white)
+                
+                // or with shades
+                
+                bubbleStyle = BubbleStyle(
+                        textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white),
+                        gradient = BubbleGradient(colors.getColor((position * 2) % 8, 0),
+                                colors.getColor((position * 2) % 8 + 1, 0), if (position % 2 == 0) BubbleGradient.VERTICAL else BubbleGradient.HORIZONTAL)
+                )
+    
+                bubbleSelectedStyle = BubbleStyle(
+                        textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white),
+                        gradient = BubbleGradient(colors.getColor((position * 2) % 8, 0),
+                                colors.getColor((position * 2) % 8 + 1, 0), if (position % 2 == 1) BubbleGradient.VERTICAL else BubbleGradient.HORIZONTAL)
+                )
+                
+                // or with images
+                
+                bubbleStyle = BubbleStyle(
+                        textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white),
+                        backgroundColor = ContextCompat.getColor(this@MainActivity, colors.getResourceId((position * 2) % colors.length(), 0)),
+                        icon = ContextCompat.getDrawable(this@MainActivity, R.drawable.ic_flag_white_24dp),
+                        iconPosition = if (position % 2 == 0) IconPosition.TOP else IconPosition.BOTTOM
+                )
+    
+                // or whit icon
+    
+                bubbleSelectedStyle = BubbleStyle(
+                        textColor = ContextCompat.getColor(this@MainActivity, android.R.color.white),
+                        image = ContextCompat.getDrawable(this@MainActivity, images.getResourceId(position, 0))
+                )
+    
+            }
         }
     }
-}
-
-colors.recycle()
+    
+    colors.recycle()
 
 Specify the BubblePickerListener to get notified about events
 
-Kotlin
+    Kotlin
+    
+    picker.listener = object : BubblePickerListener {
+        override fun onBubbleSelected(item: PickerItem) {
 
-picker.listener = object : BubblePickerListener {
-            override fun onBubbleSelected(item: PickerItem) {
+        }
 
-            }
+        override fun onBubbleDeselected(item: PickerItem) {
 
-            override fun onBubbleDeselected(item: PickerItem) {
-
-            }
-}
+        }
+    }
 Java
 
-picker.setListener(new BubblePickerListener() {
-            @Override
-            public void onBubbleSelected(@NotNull PickerItem item) {
-                
-            }
+    picker.setListener(new BubblePickerListener() {
+        @Override
+        public void onBubbleSelected(@NotNull PickerItem item) {
+            
+        }
 
-            @Override
-            public void onBubbleDeselected(@NotNull PickerItem item) {
+        @Override
+        public void onBubbleDeselected(@NotNull PickerItem item) {
 
-            }
-});
+        }
+    });
 To get all selected items use picker.selectedItems variable in Kotlin or picker.getSelectedItems() method in Java.
 
 For more usage examples please review the sample app
