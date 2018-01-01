@@ -35,7 +35,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "com.android.support:appcompat-v7:$supportLibVersion"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-
+    compile "com.android.support:support-annotations:$supportLibVersion"
     compile files('libs/jbox2d-library-2.1.2.2.jar')
     compile files('libs/slf4j-api-1.7.22.jar')
 }

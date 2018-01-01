@@ -1,10 +1,7 @@
 package com.igalata.bubblepicker.rendering
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.opengl.GLES20.*
 import android.opengl.Matrix
 import android.support.v4.widget.TextViewCompat
@@ -65,7 +62,6 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
         layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT).apply {
             weight = 1f
         }
-        setImageDrawable(pickerItem.icon)
         scaleType = ImageView.ScaleType.CENTER
     }
 
@@ -110,12 +106,15 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
         drawBackground(canvas, isSelected)
 
         viewText.maxLines = 1
-        viewText.setTextColor(if (isSelected) pickerItem.selectedTextColor?:pickerItem.textColor!! else pickerItem.textColor!!)
-        viewIcon.visibility = when {
-            isSelected && pickerItem.showIconInSelectedBubble -> View.VISIBLE
-            !isSelected && pickerItem.showIconInBubble -> View.VISIBLE
-            else -> View.GONE
-        }
+        val bubbleStyle = if (isSelected) pickerItem.bubbleSelectedStyle else pickerItem.bubbleStyle
+        viewText.setTextColor(bubbleStyle.textColor ?: pickerItem.bubbleStyle.textColor
+        ?: Color.WHITE)
+        if (bubbleStyle.icon != null) {
+            viewIcon.setImageDrawable(bubbleStyle.icon)
+            viewIcon.visibility = View.VISIBLE
+        } else viewIcon.visibility = View.GONE
+
+
 
         measure()
         layout()
@@ -157,13 +156,10 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
     private fun drawBackground(canvas: Canvas, isSelected: Boolean) {
         val bgPaint = Paint()
         bgPaint.style = Paint.Style.FILL
-        pickerItem.color?.let {
-            if (isSelected) {
-                bgPaint.color = pickerItem.selectedColor!!
-            } else {
-                bgPaint.color = pickerItem.color!!
-            }
-        }
+        val bubbleStyle = if (isSelected) pickerItem.bubbleSelectedStyle else pickerItem.bubbleStyle
+
+        bgPaint.color = bubbleStyle.backgroundColor ?: Color.BLACK
+
         canvas.drawRect(0f, 0f, bitmapSize, bitmapSize, bgPaint)
     }
 
