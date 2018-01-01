@@ -44,7 +44,7 @@ class BubblePicker : GLSurfaceView {
             }
         }
 
-    private val renderer = PickerRenderer(this)
+    private var renderer = PickerRenderer(this)
     private var startX = 0f
     private var startY = 0f
     private var previousX = 0f

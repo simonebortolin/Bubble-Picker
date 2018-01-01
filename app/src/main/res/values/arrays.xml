@@ -39,7 +39,7 @@
         <item>@drawable/paraguay</item>
     </integer-array>
 
-    <integer-array name="colors">
+    <integer-array name="colors_gradient">
         <item>@color/roseStart</item>
         <item>@color/roseEnd</item>
         <item>@color/blueStart</item>
@@ -48,6 +48,17 @@
         <item>@color/greenEnd</item>
         <item>@color/purpleStart</item>
         <item>@color/purpleEnd</item>
+    </integer-array>
+
+    <integer-array name="colors">
+        <item>@color/rose</item>
+        <item>@color/roseDark</item>
+        <item>@color/blue</item>
+        <item>@color/blueDark</item>
+        <item>@color/green</item>
+        <item>@color/greenDark</item>
+        <item>@color/purple</item>
+        <item>@color/purpleDark</item>
     </integer-array>
 
 </resources>

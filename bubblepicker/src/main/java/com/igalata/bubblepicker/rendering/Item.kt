@@ -45,6 +45,8 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
     private var imageTexture: Int = 0
     private val currentTexture: Int
         get() = if (circleBody.increased || circleBody.isIncreasing) imageTexture else texture
+
+
     private val bitmapSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 96f, context.resources.displayMetrics)
     private val bitmapRect = Rect().apply {
         set(0, 0, bitmapSize.toInt(), bitmapSize.toInt())
@@ -158,9 +160,24 @@ data class Item(val context: Context, val pickerItem: PickerItem, val circleBody
         bgPaint.style = Paint.Style.FILL
         val bubbleStyle = if (isSelected) pickerItem.bubbleSelectedStyle else pickerItem.bubbleStyle
 
-        bgPaint.color = bubbleStyle.backgroundColor ?: Color.BLACK
+        when {
+            bubbleStyle.backgroundColor != null -> bgPaint.color = bubbleStyle.backgroundColor ?: Color.BLACK
+            bubbleStyle.gradient != null -> bgPaint.shader = bubbleStyle.gradient?.gradient
+            bubbleStyle.image != null -> bgPaint.alpha = (pickerItem.overlayAlpha * 255).toInt()
+            else -> bgPaint.color = Color.BLACK
+        }
+
+
 
         canvas.drawRect(0f, 0f, bitmapSize, bitmapSize, bgPaint)
+
+        if (bubbleStyle.borderColor != null) {
+            bgPaint.style = Paint.Style.STROKE
+            bgPaint.color = bubbleStyle.borderColor!!
+        }
+
+        canvas.drawRect(0f, 0f, bitmapSize, bitmapSize, bgPaint)
+
     }
 
     private fun bindTexture(textureIds: IntArray, index: Int, withImage: Boolean): Int {

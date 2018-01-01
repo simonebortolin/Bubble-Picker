@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_simple"
+        android:icon="@drawable/ic_crop_square_black_24dp"
+        android:title="Simple" />
+
+    <item
+        android:id="@+id/navigation_gradient"
+        android:icon="@drawable/ic_gradient_black_24dp"
+        android:title="Gradient" />
+
+    <item
+        android:id="@+id/navigation_imgae"
+        android:icon="@drawable/ic_image_black_24dp"
+        android:title="Background" />
+
+</menu>
